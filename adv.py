@@ -21,13 +21,129 @@ room_graph=literal_eval(open(map_file, "r").read())
 world.load_graph(room_graph)
 
 # Print an ASCII map
-world.print_rooms()
+# world.print_rooms()
 
 player = Player(world.starting_room)
+# player.travel('s')
+# player.travel('w')
+# print('DIRECTIONS AVAILABLE TO MOVE', player.current_room.get_exits())
+# print('ID OF ROOM =', player.current_room.id)
+
+
+
+
+#What am I trying to do?
+    #Fill traversal path that when walked in order will visit every room on the map at least once
+    #Fill list with valid traversal directions
+    #Pick a random direction -> travel -> log direction -> loop
+    #If you hit a deadend -> backtrack(need way to reverse direction) to nearest room with unexplored paths
+
+#You may find the commands `player.current_room.id`, `player.current_room.get_exits()` and `player.travel(direction)` useful.
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
+
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
+
+#get_exits
+#
 traversal_path = []
+graph = {}
+
+def bfs(starting_node): #1
+    # Build the graph
+    # Do a BFS (storing the path)
+    qq = Queue()
+    qq.enqueue([starting_node]) #1
+    visted = set()
+
+    while qq.size() > 0:
+        path = qq.dequeue()
+        v = path[-1]
+        # If the path is longer or equal and the value is smaller, or if the path is longer)
+        if v not in visted:
+            visted.add(v)
+
+# {
+#   0: {'n': '?', 's': 5, 'w': '?', 'e': '?'},
+#   5: {'n': 0, 's': '?', 'e': '?'}
+# }
+            #DO THE THING
+            for i in graph[v]:
+                if graph[v][i] == '?':
+                    return path
+ 
+            for neighbor in graph[v]:
+                adjacent_room = graph[v][neighbor]
+                path_copy = path.copy()
+                path_copy.append(adjacent_room)
+                qq.enqueue(path_copy)
+        return None
+
+def opposite(direction):
+    if direction == 'n':
+        return 's'
+    elif direction == 's':
+        return 'n'
+    elif direction == 'e':
+        return 'w'
+    elif direction == 'w':
+        return 'e'
+
+while len(graph) != len(world.rooms):
+
+        #init direction to look like this 
+        #{ 0: {'n': '?', 's': '?', 'w': '?', 'e': '?'}}
+
+        if player.current_room.id not in graph:
+            graph[player.current_room.id] = {i: '?' for i in player.current_room.get_exits()}
+
+    #init room_exit
+        room_exit = None
+
+        for available_direction in graph[player.current_room.id]:
+            if graph[player.current_room.id][available_direction] == '?':
+                room_exit = available_direction
+
+                if room_exit is not None:
+                    traversal_path.append(room_exit)
+                    player.travel(room_exit)
+
+        
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -51,12 +167,12 @@ else:
 #######
 # UNCOMMENT TO WALK AROUND
 #######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
