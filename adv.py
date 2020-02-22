@@ -30,8 +30,6 @@ player = Player(world.starting_room)
 # print('ID OF ROOM =', player.current_room.id)
 
 
-
-
 #What am I trying to do?
     #Fill traversal path that when walked in order will visit every room on the map at least once
     #Fill list with valid traversal directions
@@ -52,8 +50,6 @@ class Queue():
     def size(self):
         return len(self.queue)
 
-
-
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 
@@ -61,6 +57,16 @@ class Queue():
 #
 traversal_path = []
 graph = {}
+
+#bfs needs to be modified
+#bfs can be part
+# player will reach a dead end
+#no avilable directions
+#or already visited room
+#backtrack
+#shortest path from dead end to nearest rooom with available directions to explore
+#current rooom updates
+#is the potential room already in the graph set
 
 def bfs(starting_node): #1
     # Build the graph
@@ -71,22 +77,23 @@ def bfs(starting_node): #1
 
     while qq.size() > 0:
         path = qq.dequeue()
-        v = path[-1]
+        vertex = path[-1]
         # If the path is longer or equal and the value is smaller, or if the path is longer)
-        if v not in visted:
-            visted.add(v)
+        if vertex not in visted:
+            visted.add(vertex)
 
 # {
 #   0: {'n': '?', 's': 5, 'w': '?', 'e': '?'},
 #   5: {'n': 0, 's': '?', 'e': '?'}
 # }
             #DO THE THING
-            for i in graph[v]:
-                if graph[v][i] == '?':
+            for i in graph[vertex]:
+                if graph[vertex][i] == '?':
                     return path
- 
-            for neighbor in graph[v]:
-                adjacent_room = graph[v][neighbor]
+
+                    #loop thru all values in graph[path[-1]]
+            for neighbor in graph[vertex]:
+                adjacent_room = graph[vertex][neighbor]
                 path_copy = path.copy()
                 path_copy.append(adjacent_room)
                 qq.enqueue(path_copy)
@@ -101,25 +108,56 @@ def opposite(direction):
         return 'w'
     elif direction == 'w':
         return 'e'
-
-while len(graph) != len(world.rooms):
-
         #init direction to look like this 
         #{ 0: {'n': '?', 's': '?', 'w': '?', 'e': '?'}}
-
-        if player.current_room.id not in graph:
-            graph[player.current_room.id] = {i: '?' for i in player.current_room.get_exits()}
-
+#Does the length of graph equal 500 yet?
     #init room_exit
-        room_exit = None
+while len(graph) != len(world.rooms):
+    current = player.current_room.id
 
-        for available_direction in graph[player.current_room.id]:
-            if graph[player.current_room.id][available_direction] == '?':
-                room_exit = available_direction
+    if current not in graph:
+        graph[current] = {i: '?' for i in player.current_room.get_exits()}
+        print(graph[current], "GRAPH CURRENT")
 
-                if room_exit is not None:
-                    traversal_path.append(room_exit)
-                    player.travel(room_exit)
+    print(graph, "GRAPH ONE")
+    room_exit = None
+
+    for direction in graph[current]:
+        if graph[current][direction] == '?':
+            room_exit = direction
+            
+            if room_exit is not None:
+                traversal_path.append(room_exit)
+                print(traversal_path, "TRAVERSAL PATH INITIAL")
+                player.travel(room_exit)
+
+                if player.current_room.id not in graph:
+                    graph[player.current_room.id] = {
+                        i: '?' for i in player.current_room.get_exits()
+                    }
+
+            graph[current][room_exit] = player.current_room.id
+            graph[player.current_room.id][opposite(room_exit)] = current
+            current = player.current_room.id
+            print(graph, "GRAPH TW0)")
+            break
+
+    player_map = bft(player.current_room.id)
+
+    if player_map is not None:
+        for room in player_map:
+            print(room, "ROOM")
+            for direction in graph[current]:
+                print(graph[current], "GRAPH CURRENT")
+                # print(graph[current][direction], "DIRECTION")
+                if graph[current][direction] == room:
+                    print(graph[current][direction], room, "GRAPH CUR DIR & ROOM")
+                    print(direction, "DIRECTION")
+                    traversal_path.append(direction)
+                    print(traversal_path, "TRAVERSAL PATH")
+                    player.travel(direction)
+            
+            current = player.current_room.id
 
         
     
