@@ -97,7 +97,7 @@ def bfs(starting_node): #1
                 path_copy = path.copy()
                 path_copy.append(adjacent_room)
                 qq.enqueue(path_copy)
-        return None
+    return None
 
 def opposite(direction):
     if direction == 'n':
@@ -113,52 +113,41 @@ def opposite(direction):
 #Does the length of graph equal 500 yet?
     #init room_exit
 while len(graph) != len(world.rooms):
+    #init current to current room ID
     current = player.current_room.id
-
-    if current not in graph:
-        graph[current] = {i: '?' for i in player.current_room.get_exits()}
-        print(graph[current], "GRAPH CURRENT")
-
-    print(graph, "GRAPH ONE")
+    #init room exit to None
     room_exit = None
 
+    #Is the current room ID in graph={}?
+    if player.current_room.id not in graph:
+        #No? insert the room ID as the key and init all the exits that are returned from the get_exits with a value of '?' becuase we don't yet know what rooms are attached to those exits until we navigate through them
+        graph[player.current_room.id] = {i: '?' for i in player.current_room.get_exits()}
+
+    #For all directions available to travel e.g. 
     for direction in graph[current]:
+        #If value of any of the directions out of the current room is '?'
         if graph[current][direction] == '?':
+            #set room_exit to that direction
             room_exit = direction
             
+            #is room_exit valid?
             if room_exit is not None:
+                #add that exit to the traversal path
                 traversal_path.append(room_exit)
-                print(traversal_path, "TRAVERSAL PATH INITIAL")
+                #move the player to that exit
                 player.travel(room_exit)
-
+                #Is the current room ID in graph={}?
                 if player.current_room.id not in graph:
+                #No? insert the room ID as the key and init all the exits that are returned from the get_exits with a value of '?' becuase we don't yet know what rooms are attached to those exits until we navigate through them
                     graph[player.current_room.id] = {
                         i: '?' for i in player.current_room.get_exits()
                     }
 
-            graph[current][room_exit] = player.current_room.id
-            graph[player.current_room.id][opposite(room_exit)] = current
-            current = player.current_room.id
-            print(graph, "GRAPH TW0)")
-            break
 
-    player_map = bft(player.current_room.id)
 
-    if player_map is not None:
-        for room in player_map:
-            print(room, "ROOM")
-            for direction in graph[current]:
-                print(graph[current], "GRAPH CURRENT")
-                # print(graph[current][direction], "DIRECTION")
-                if graph[current][direction] == room:
-                    print(graph[current][direction], room, "GRAPH CUR DIR & ROOM")
-                    print(direction, "DIRECTION")
-                    traversal_path.append(direction)
-                    print(traversal_path, "TRAVERSAL PATH")
-                    player.travel(direction)
-            
-            current = player.current_room.id
+    # traveral_of_map = bfs(player.current_room.id)
 
+ 
         
     
 
