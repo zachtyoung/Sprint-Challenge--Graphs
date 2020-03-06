@@ -123,7 +123,7 @@ while len(graph) != len(world.rooms):
         #No? insert the room ID as the key and init all the exits that are returned from the get_exits with a value of '?' becuase we don't yet know what rooms are attached to those exits until we navigate through them
         graph[player.current_room.id] = {i: '?' for i in player.current_room.get_exits()}
 
-    #For all directions available to travel e.g. 
+    #For all directions available to travel e.g. 0:{'n':'?','s': '?'}
     for direction in graph[current]:
         #If value of any of the directions out of the current room is '?'
         if graph[current][direction] == '?':
@@ -143,11 +143,22 @@ while len(graph) != len(world.rooms):
                         i: '?' for i in player.current_room.get_exits()
                     }
 
+            graph[current][room_exit] = player.current_room.id
+            graph[player.current_room.id][opposite(room_exit)] = current
+            current = player.current_room.id
+            break
 
+    traveral_of_map = bfs(player.current_room.id)
 
-    # traveral_of_map = bfs(player.current_room.id)
+    if traveral_of_map is not None:
+        for room in traveral_of_map:
+            for direction in graph[current]:
+                if graph[current][direction] == room:
+                    traversal_path.append(direction)
+                    player.travel(direction)
+            
+            current = player.current_room.id
 
- 
         
     
 
